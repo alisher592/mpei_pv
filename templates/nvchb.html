@@ -1,0 +1,20 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Новочебоксарск
+{% endblock %}
+
+{% block body %}
+<center><h4><p><a href="http://ntc.nudl.net" target="_blank">Новочебоксарск </a></p></h4></center>
+<center><img src="{{ image }}"/></center>
+
+<center>
+    {% for table in tables %}
+            {{titles[loop.index]}}
+            {{ table|safe }}
+          {% endfor %}
+</center>
+
+
+{% endblock %}
+
