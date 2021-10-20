@@ -70,7 +70,7 @@ class Forecaster():
         return forecast.iloc[1:horizon+1] #возвращает датайфрейм с прогнозом
 
     def mkforecast(filename, weather_fcst, columns, X_scaler_param_file,
-                Y_scaler_param_file, pv_tilt, pv_azimuth, test_mode, savefile = True):
+                Y_scaler_param_file, pv_tilt, pv_azimuth, test_mode, savefile = False):
         """
         filename (str) - путь к pickle-файлу модели прогноза
         weather_fcst (pandas Dataframe) - датафрейм с данными метеопрогноза
