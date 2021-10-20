@@ -35,7 +35,7 @@ def mpei():
     # remove nighttime
     solpos = solpos.loc[solpos['apparent_elevation'] > 0, :]
 
-    fig, ax = plt.subplots(figsize=(18, 8))
+    fig, ax = plt.subplots(figsize=(12, 4))
 
     points = ax.scatter(solpos.azimuth, solpos.apparent_elevation, s=2,
                         c=solpos.index.dayofyear, label=None)
@@ -57,16 +57,19 @@ def mpei():
 
     ax.scatter(solarposition.get_solarposition(datetime.utcnow(), lat, lon).azimuth,
                solarposition.get_solarposition(datetime.utcnow(), lat, lon).apparent_elevation, s=1200, label='now')
-    im = plt.imread("mpei_pano2.jpg")
-    implot = plt.imshow(im, origin='upper', extent=[0, 360, 0, 25])
+    t = 0
+    if t == 0:
+        im = plt.imread("mpei_pano2_cmpr.jpg")
+
+    implot = plt.imshow(im, origin='upper', extent=[0, 360, 0, 21])
 
     # plt.scatter([100,8000], [0, 1500])
 
     # ax.plot(x, x, '--', linewidth=5, color='firebrick')
-    ax.figure.legend(loc='upper left')
+    # ax.figure.legend(loc='upper left')
     ax.set_xlabel('Solar Azimuth (degrees)')
     ax.set_ylabel('Solar Elevation (degrees)')
-
+    #ax.set_aspect('auto')
     # Convert plot to PNG image
     pngImage = io.BytesIO()
     FigureCanvas(fig).print_png(pngImage)

@@ -5,15 +5,56 @@
 {% endblock %}
 
 {% block body %}
-<center><h4><p><a href="http://ntc.nudl.net" target="_blank">Новочебоксарск </a></p></h4></center>
-<center><img src="{{ image }}"/></center>
 
-<center>
-    {% for table in tables %}
-            {{titles[loop.index]}}
-            {{ table|safe }}
-          {% endfor %}
-</center>
+<head>
+    <style>
+    {
+        box-sizing: border-box;
+    }
+    /* Set additional styling options for the columns*/
+    .column {
+    float: left;
+    width: 50%;
+    white-space: nowrap;
+    }
+
+    .right1 {
+    width: 25%;
+    }
+
+    .right2 {
+    width: 25%;
+    }
+
+    .row:after {
+    content: "";
+    display: table;
+    clear: both;
+    }
+    </style>
+ </head>
+
+
+<center><h4><p><a href="http://ntc.nudl.net" target="_blank">Новочебоксарск </a></p></h4></center>
+
+<body>
+    <div class="row">
+        <div class="column left">
+            <center><img src="{{ image }}"/></center>
+        </div>
+        <div class="column right">
+            <center><h5>Прогноз в табличном виде</h5></center>
+            <center>
+                {% for table in tables %}
+                {{titles[loop.index]}}
+                {{ table|safe }}
+                {% endfor %}
+                </center>
+        </div>
+    </div>
+ </body>
+
+
 
 
 {% endblock %}

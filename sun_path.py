@@ -13,7 +13,7 @@ solpos = solarposition.get_solarposition(times, lat, lon)
 # remove nighttime
 solpos = solpos.loc[solpos['apparent_elevation'] > 0, :]
 
-fig, ax = plt.subplots(figsize=(18,8))
+fig, ax = plt.subplots(figsize=(8,5))
 
 points = ax.scatter(solpos.azimuth, solpos.apparent_elevation, s=2,
                     c=solpos.index.dayofyear, label=None)
@@ -36,7 +36,10 @@ for date in pd.to_datetime(['2019-03-21', '2019-06-21', '2019-12-21', datetime.n
     ax.plot(solpos.azimuth, solpos.apparent_elevation, label=label)
 
 ax.scatter(solarposition.get_solarposition(datetime.utcnow(), lat, lon).azimuth, solarposition.get_solarposition(datetime.utcnow(), lat, lon).apparent_elevation, s=1200, label = 'now')
-im = plt.imread("mpei_pano2.jpg")
+t==0
+if t==0:
+    im = plt.imread("mpei_pano2_cmpr.jpg")
+
 implot = plt.imshow(im, origin='upper', extent=[0, 360, 0, 25])
 
 
@@ -44,8 +47,6 @@ implot = plt.imshow(im, origin='upper', extent=[0, 360, 0, 25])
 #plt.scatter([100,8000], [0, 1500])
 
 #ax.plot(x, x, '--', linewidth=5, color='firebrick')
-ax.figure.legend(loc='upper left')
+#ax.figure.legend(loc='upper left')
 ax.set_xlabel('Solar Azimuth (degrees)')
 ax.set_ylabel('Solar Elevation (degrees)')
-
-plt.show()
