@@ -18,23 +18,29 @@ import bs4
 import requests
 import json
 from flask_wtf import Form
-from wtforms.fields.html5 import DateField
+#from wtforms.fields.html5 import DateField
+from flask_bootstrap import Bootstrap
+from flask_datepicker import datepicker
+
+
 
 app = Flask(__name__)
 app.config['SQLALCHEMY_DATABASE_URI'] = 'sqlite:///data.db'
+Bootstrap(app)
 db = SQLAlchemy(app)
+app.debug = True
 
 ntc_url = 'http://ntc.nudl.net/show_nchb.php'
 
-class Row(db.Model):
-    __tablename__ = "data_history"
-    #id = db.Column(db.Integer, primary_key=True)
-    datetime = db.Column(db.DateTime, default=datetime.utcnow())
-    datetime_idx = db.Column(db.String, primary_key=True)
-    poa_fcst = db.Column(db.Float)
-
-    def __repr__(self):
-        return '<Row %r>' % self.id
+# class Row(db.Model):
+#     __tablename__ = "data_history"
+#     #id = db.Column(db.Integer, primary_key=True)
+#     datetime = db.Column(db.DateTime, default=datetime.utcnow())
+#     datetime_idx = db.Column(db.String, primary_key=True)
+#     poa_fcst = db.Column(db.Float)
+#
+#     def __repr__(self):
+#         return '<Row %r>' % self.id
 
 
 
@@ -113,32 +119,6 @@ def user (name, id):
 
 
 @app.route("/nvchb", methods=["GET"])
-# def ntc_data_loader(given_date):
-#     target_date = datetime.strptime(given_date, '%Y-%m-%d').date()
-#     data = {'language': 'Русский', 'date_sel': target_date, 'ServerId': '100'}
-#     # print(urllib.request.urlopen(url).getcode(), type(urllib.request.urlopen(url).getcode()))
-#     if urllib.request.urlopen(ntc_url).getcode() == 200:
-#         soup = bs4.BeautifulSoup(requests.post(ntc_url, data).text, 'lxml')
-#         js = soup.find_all('script', {'type': 'text/javascript', 'language': 'javascript'})
-#         if len(js) != 0:
-#             Irradiance = js[0].string.split(';')[22][
-#                          21:len(js[0].string.split(';')[22])]  # комментарий от 2.12.20. Пришлось
-#             # заменить метод для .text BeautifulSoupTag  на .string из-за изменений в библиотеке BeautifulSoup
-#             result = json.loads(Irradiance)
-#             I_raw = np.array(result)  # сырой массив с мгновенными данными по СР
-#             Irr = pd.DataFrame(I_raw)
-#             Irr[0] = pd.to_datetime(Irr[0], unit='ms')  # преобразование
-#             Irr = Irr.set_index(0)
-#             Irr = Irr.tz_localize('UTC').tz_convert('Europe/Moscow')  # подстройка под часовой пояс Москвы
-#             Irr = Irr.tz_localize(None)
-#             Irr_mean = Irr.groupby(Irr.index.to_period('H')).mean()  # среднечасовые значения СР
-#             Irr_mean.index = Irr_mean.index.to_timestamp()
-#         else:
-#             Irr, Irr_mean = None, None
-#     else:
-#         Irr, Irr_mean = None, None
-#     return Irr, Irr_mean
-
 def plotView():
     # Generate plot
     plt.style.use('seaborn-white')
@@ -147,15 +127,21 @@ def plotView():
     axis.set_title("Прогноз сделан в " + datetime.now().strftime("%H:%M %d-%m-%Y"))
     axis.set_xlabel("Дата и время")
     axis.set_ylabel("Среднечасовая интенсивность солнечной \nрадиации, Вт/кв.м")
+
+    fig2 = Figure(figsize=(8, 5))
+    axis2 = fig2.add_subplot(1, 1, 1)
+    axis2.set_title("Запрос данных мониторинга сделан в " + datetime.now().strftime("%H:%M %d-%m-%Y"))
+    axis2.set_xlabel("Дата и время")
+    axis2.set_ylabel("Интенсивность солнечной \nрадиации, Вт/кв.м")
+
     forecast_itself = sun_forecast.get_forecast()
 
-    #ntc_data = ntc_data_loader(datetime.now().strftime("%Y-%m-%d"))
+    ntc_data = ntc_data_loader()
+    print(ntc_data)
+    #print(forecast_itself.index.strftime("%Y/%m/%d %H:%M"))
 
-    print(forecast_itself.index.strftime("%Y/%m/%d %H:%M"))
 
-    form = ExampleForm()
-    if form.validate_on_submit():
-        return form.dt.data.strftime('%Y-%m-%d')
+
 
     # row=Row()
     #
@@ -188,15 +174,56 @@ def plotView():
     pngImageB64String = "data:image/png;base64,"
     pngImageB64String += base64.b64encode(pngImage.getvalue()).decode('utf8')
 
-    return render_template("nvchb.html", image=pngImageB64String,
-                           tables=[pd.DataFrame(forecast_itself).to_html()],
-                           titles=pd.DataFrame(forecast_itself).columns.values, form = form)
+    axis2.plot(forecast_itself, label = 'Прогноз')
+    axis2.plot(ntc_data[0], label = "Факт. данные \n в исходном разрешении")
+    axis2.plot(ntc_data[1], label="Факт. данные \n с часовым усреднением")
+    axis2.xaxis_date()
+    axis2.grid()
+    axis2.legend(loc='best')
+    # axis.plot(range(5), range(5), "ro-")
 
-class ExampleForm(Form):
-    dt = DateField('DatePicker', format='%Y-%m-%d')
+    # Convert plot to PNG image
+    pngImage2 = io.BytesIO()
+    FigureCanvas(fig2).print_png(pngImage2)
+
+    # Encode PNG image to base64 string
+    pngImageB64String2 = "data:image/png;base64,"
+    pngImageB64String2 += base64.b64encode(pngImage2.getvalue()).decode('utf8')
+
+    return render_template("nvchb.html", image=pngImageB64String, image2=pngImageB64String2,
+                           tables=[pd.DataFrame(forecast_itself).to_html()],
+                           titles=pd.DataFrame(forecast_itself).columns.values)
+
+
+def ntc_data_loader(given_date=datetime.now().strftime("%Y-%m-%d")):
+    target_date = datetime.strptime(given_date, '%Y-%m-%d').date()
+    data = {'language': 'Русский', 'date_sel': target_date, 'ServerId': '100'}
+    #print(urllib.request.urlopen(ntc_url).getcode(), type(urllib.request.urlopen(ntc_url).getcode()))
+    if urllib.request.urlopen(ntc_url).getcode() == 200:
+        soup = bs4.BeautifulSoup(requests.post(ntc_url, data).text, 'lxml')
+        js = soup.find_all('script', {'type': 'text/javascript', 'language': 'javascript'})
+
+        if len(js) != 0:
+            Irradiance = js[0].string.split(';')[22][
+                         21:len(js[0].string.split(';')[22])]  # комментарий от 2.12.20. Пришлось
+            # заменить метод для .text BeautifulSoupTag  на .string из-за изменений в библиотеке BeautifulSoup
+            result = json.loads(Irradiance)
+            I_raw = np.array(result)  # сырой массив с мгновенными данными по СР
+            Irr = pd.DataFrame(I_raw)
+            Irr[0] = pd.to_datetime(Irr[0], unit='ms')  # преобразование
+            Irr = Irr.set_index(0)
+            Irr = Irr.tz_localize('UTC').tz_convert('Europe/Moscow')  # подстройка под часовой пояс Москвы
+            Irr = Irr.tz_localize(None)
+            Irr_mean = Irr.groupby(Irr.index.to_period('H')).mean()  # среднечасовые значения СР
+            Irr_mean.index = Irr_mean.index.to_timestamp()
+        else:
+            Irr, Irr_mean = None, None
+    else:
+        Irr, Irr_mean = None, None
+    return Irr, Irr_mean
 
 
 
 
 if __name__ == "__main__":
-    app.run(debug=False)
+    app.run(debug=True)
