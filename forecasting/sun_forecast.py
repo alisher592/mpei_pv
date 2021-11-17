@@ -115,7 +115,7 @@ class SunForecast():
         # вычисление выработки массива ФЭМ по спрогнозированной интенсивности солнечной радиации
         #PV_output = Forecaster.PV_array_yield(self.pv_model['stc_power'], self.pv_model['area'], self.pv_model['kt'], I['irradiance'], I['air_temperature'], self.pv_modules_number)
 
-        return I['irradiance'] # .to_json(date_format='iso', date_unit='s') #PV_output.to_json(date_format='iso', date_unit='s')
+        return I['irradiance'], weather_forecast # .to_json(date_format='iso', date_unit='s') #PV_output.to_json(date_format='iso', date_unit='s')
 
     def get_test_forecast(self):
         # тестовый прогноз на сутки 

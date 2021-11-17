@@ -134,7 +134,8 @@ def plotView():
     axis2.set_xlabel("Дата и время")
     axis2.set_ylabel("Интенсивность солнечной \nрадиации, Вт/кв.м")
 
-    forecast_itself = sun_forecast.get_forecast()
+    forecast_itself = sun_forecast.get_forecast()[0]
+    sun_forecast.get_forecast()[1].to_csv('raw.csv')
 
     ntc_data = ntc_data_loader()
     print(ntc_data)
