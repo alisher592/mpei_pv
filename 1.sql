@@ -1,5 +1,6 @@
-CREATE TABLE yrno_nvchb1(fcst_id INT,
-					DateTime CHAR(10),
+CREATE TABLE yrno_nvchb2(id INT AUTO_INCREMENT UNIQUE,
+					fcst_id VARCHAR(20),
+					DateTime VARCHAR(20),
                     air_pressure double,
                     air_temperature double,
                     cloud_area_frac double,

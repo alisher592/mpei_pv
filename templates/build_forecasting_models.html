@@ -1,0 +1,124 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Информация
+{% endblock %}
+
+{% block body %}
+
+<h5 class="display-6">Построение модели прогнозирования СИ</h5>
+
+<head>
+
+<script>
+
+        $(function() {
+    $('#upload-file-btn').click(function() {
+        var form_data = new FormData($('#upload-file')[0]);
+        $.ajax({
+            type: 'POST',
+            url: '/uploadajax',
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(data) {
+                console.log('Success!');
+            },
+        });
+    });
+});
+
+
+        function load_inputs() {
+            $.('#upload-file-btn').click(function()({
+                type: "POST",
+                url: "/build_forecasting_models",
+                data: $('form').serialize(),
+                type: 'POST',
+                success: function (data) {
+                    Plotly.newPlot('chart', result, {staticPlot: true});;
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+
+
+<form class="row align-items-center">
+  <label for="geo_coord" class="form-label" style="margin-left:22px">Координаты местности</label>
+  <div class="row align-items-center" id="geo_coord" style="width: 600px; margin-bottom:10px; margin-left:10px">
+  <div class="col">
+    <input id="lat" name="latitude" type="text" class="form-control" placeholder="Широта" aria-label="First name">
+  </div>
+  <div class="col" >
+    <input id="lon" name="longitude" type="text" class="form-control" placeholder="Долгота" aria-label="Last name">
+  </div>
+</div>
+
+  <label for="geo_coord2" class="form-label" style="margin-left:22px">Геоданные</label>
+  <div class="row align-items-center" id="geo_coord2" style="width: 600px; margin-left:10px">
+  <div class="col" >
+    <input id="alt" name="altitude" type="text" class="form-control" placeholder="Высота над уровнем моря, м" aria-label="First name">
+  </div>
+  <div class="col">
+    <input id="tz" name="timezone" type="text" class="form-control" placeholder="Часовой пояс" aria-label="Last name">
+  </div>
+</div>
+</form>
+
+  <form> method=POST
+<div class="input-group" style="width: 600px; margin-left:10px">
+  <input type="file" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+  <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon04">Загрузить</button>
+</div>
+</form>
+
+  <div class="col-auto" style="margin-top:10px; margin-bottom:10px; margin-left:22px">
+
+    <button type="submit" class="btn btn-primary" onclick="get_geo();">Получить данные TMY </button>
+  </div>
+
+<div class="row" style="width: 1000px; margin-left:10px">
+  <div class="col">
+    <div id="chart" class="chart"></div>
+  </div>
+</div>
+
+
+<script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
+    <script>
+        function cb(selection) {
+            $.getJSON({
+                url: "/callback", data: { 'data': selection }, success: function (result) {
+                    Plotly.newPlot('chart', result, {staticPlot: true});;
+                }
+            });
+        }
+    </script>
+
+
+
+
+
+<script>
+    d = {{ graphJSON | safe }};
+    //d.config={staticPlot: true};
+    Plotly.newPlot('chart', d, {});
+</script>
+
+
+</head>
+
+
+
+
+
+
+
+
+
+{% endblock %}

@@ -1,0 +1,1 @@
+DELETE FROM heroku_a8cb90579877805.yrno_mpei1

@@ -14,6 +14,8 @@ import json
 from forecaster import Forecaster
 import pandas as pd
 import random
+from pvlib.irradiance import aoi
+from pvlib.solarposition import spa_python
 
 class SunForecast():
     def __init__(self):
@@ -116,6 +118,29 @@ class SunForecast():
         #PV_output = Forecaster.PV_array_yield(self.pv_model['stc_power'], self.pv_model['area'], self.pv_model['kt'], I['irradiance'], I['air_temperature'], self.pv_modules_number)
 
         return I['irradiance'], weather_forecast # .to_json(date_format='iso', date_unit='s') #PV_output.to_json(date_format='iso', date_unit='s')
+
+    def get_forecast_from_sql(self, sql_df, lat, lon, tz, pv_tilt, pv_azimuth):
+        # метод должен возвращать прогноз на сутки вперед
+        # загрузка метеопрогноза с ресурса yr.no по академическому useragent из БД
+        # прогнозирование интенсивности солнечной радиации
+
+        sql_df = sql_df.tz_localize(None)
+        sql_df = sql_df.tz_localize('UTC').tz_convert(str(tz))
+        sql_df[['zenith', 'solar_azimuth']] = spa_python(sql_df.index,
+                                                           lat,
+                                                           lon)[['apparent_zenith',
+                                                                       'azimuth']]
+        sql_df['aoi'] = aoi(pv_tilt, pv_azimuth,
+                                  sql_df['zenith'], sql_df['solar_azimuth'])
+
+        I = Forecaster.mkforecast(self.trained_model_filename, sql_df,
+                                       ['aoi', 'air_temperature', 'rel_humidity', 'cloud_area_frac'],
+                                       self.X_scaler_filename, self.y_scaler_filename,
+                                       pv_tilt, pv_azimuth, test_mode=False).tz_localize(None)
+        # вычисление выработки массива ФЭМ по спрогнозированной интенсивности солнечной радиации
+        #PV_output = Forecaster.PV_array_yield(self.pv_model['stc_power'], self.pv_model['area'], self.pv_model['kt'], I['irradiance'], I['air_temperature'], self.pv_modules_number)
+
+        return I['irradiance'], sql_df
 
     def get_test_forecast(self):
         # тестовый прогноз на сутки 
