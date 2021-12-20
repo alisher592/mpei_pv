@@ -9,6 +9,9 @@
 
 <head>
 
+      <script src="https://api-maps.yandex.ru/2.1/?apikey=cfaa8f0c-0d31-4eaf-abbc-b387cc55afee&lang=ru_RU" type="text/javascript">
+    </script>
+
 <script>
         function get_geo() {
             $.getJSON({
@@ -26,10 +29,49 @@
         }
     </script>
 
+<style>
+
+.block {
+  width: 600px;
+  padding-bottom: 15px;
+  margin:0 auto;
+
+}
+.block2 {
+  width: 1200px;
+  min-height: 160px;
+  padding-top: 15px;
+  margin:0 auto;
+}
+
+.block3 {
+  width: 200px;
+  margin:0 auto;
+}
+
+.block4 {
+  width: 600px;
+  margin:0 auto;
+}
+
+.center {
+  position: absolute;
+/*  top: 0;
+  bottom: 0; */
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+</style>
+
+<script src="js/event_properties.js" type="text/javascript"></script>
+
+</head>
 
 <form class="row align-items-center">
-  <label for="geo_coord" class="form-label" style="margin-left:22px">Координаты местности</label>
-  <div class="row align-items-center" id="geo_coord" style="width: 600px; margin-bottom:10px; margin-left:10px">
+  <label for="geo_coord" class="form-label text-center">Координаты местности</label>
+  <div class="row align-items-center block" id="geo_coord">
   <div class="col">
     <input id="lat" name="latitude" type="text" class="form-control" placeholder="Широта" aria-label="First name">
   </div>
@@ -38,8 +80,8 @@
   </div>
 </div>
 
-  <label for="geo_coord2" class="form-label" style="margin-left:22px">Геоданные</label>
-  <div class="row align-items-center" id="geo_coord2" style="width: 600px; margin-left:10px">
+  <label for="geo_coord2" class="form-label text-center">Геоданные</label>
+  <div class="row align-items-center block" id="geo_coord2">
   <div class="col" >
     <input id="alt" name="altitude" type="text" class="form-control" placeholder="Высота над уровнем моря, м" aria-label="First name">
   </div>
@@ -49,13 +91,15 @@
 </div>
 </form>
 
+<div class="block4" id="map" style="width: 600px; height: 400px; padding-bottom: 15px;"></div>
 
-  <div class="col-auto" style="margin-top:10px; margin-bottom:10px; margin-left:22px">
 
-    <button type="submit" class="btn btn-primary" onclick="get_geo();">Получить данные TMY </button>
+  <div class="col-auto block3">
+
+    <button type="submit" class="btn btn-primary block3" onclick="get_geo();">Получить данные TMY </button>
   </div>
 
-<div class="row" style="width: 1000px; margin-left:10px">
+<div class="row block2">
   <div class="col">
     <div id="chart" class="chart"></div>
   </div>
@@ -85,12 +129,29 @@
 </script>
 
 
+<script type="text/javascript">
+    // Функция ymaps.ready() будет вызвана, когда
+    // загрузятся все компоненты API, а также когда будет готово DOM-дерево.
+    ymaps.ready(init);
+    function init(){
+        // Создание карты.
+        var myMap = new ymaps.Map("map", {
+            // Координаты центра карты.
+            // Порядок по умолчанию: «широта, долгота».
+            // Чтобы не определять координаты центра карты вручную,
+            // воспользуйтесь инструментом Определение координат.
+            center: [55.76, 37.64],
+            // Уровень масштабирования. Допустимые значения:
+            // от 0 (весь мир) до 19.
+            zoom: 7
+        });
+    }
+</script>
 
 
 
 
 
-</head>
 
 
 

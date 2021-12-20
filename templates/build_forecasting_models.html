@@ -6,9 +6,80 @@
 
 {% block body %}
 
-<h5 class="display-6">Построение модели прогнозирования СИ</h5>
-
 <head>
+
+  <style>
+
+.block {
+  width: 600px;
+  padding-bottom: 15px;
+  margin:0 auto;
+
+}
+.block2 {
+  width: 1200px;
+  min-height: 160px;
+  padding-top: 15px;
+  margin:0 auto;
+}
+
+.block3 {
+  width: 200px;
+  margin:0 auto;
+}
+
+.block33 {
+  width: 100px;
+  margin:0 auto;
+  padding-bottom: 10px;
+}
+
+.block4 {
+  width: 1200px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 25px;
+  font-size: 32px;
+}
+
+.block5 {
+  width: 1200px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  font-size: 22px;
+}
+
+
+
+.block6 {
+  width: 600px;
+  margin:0 auto;
+  border:1px solid #cecece;
+}
+
+.block7 {
+  width: 1200px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 18px;
+}
+
+.center {
+  position: absolute;
+/*  top: 0;
+  bottom: 0; */
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+</style>
+
+
 
 <script>
 
@@ -46,10 +117,21 @@
         }
     </script>
 
+</head>
 
-<form class="row align-items-center">
-  <label for="geo_coord" class="form-label" style="margin-left:22px">Координаты местности</label>
-  <div class="row align-items-center" id="geo_coord" style="width: 600px; margin-bottom:10px; margin-left:10px">
+<h5 class="display-6 block4">Построение модели прогнозирования СИ</h5>
+
+<p class="lead block5">
+  Vivamus sagittis lacus vel augue laoreet rutrum faucibus dolor auctor. Duis mollis, est non commodo luctus.
+</p>
+
+
+<form class="row align-items-center block6" >
+  <p class="lead block7">
+  1. Ввод исходных данных
+</p>
+  <label for="geo_coord" class="form-label text-center">Геоданные</label>
+  <div class="row align-items-center block" id="geo_coord">
   <div class="col">
     <input id="lat" name="latitude" type="text" class="form-control" placeholder="Широта" aria-label="First name">
   </div>
@@ -57,9 +139,7 @@
     <input id="lon" name="longitude" type="text" class="form-control" placeholder="Долгота" aria-label="Last name">
   </div>
 </div>
-
-  <label for="geo_coord2" class="form-label" style="margin-left:22px">Геоданные</label>
-  <div class="row align-items-center" id="geo_coord2" style="width: 600px; margin-left:10px">
+  <div class="row align-items-center block" id="geo_coord2">
   <div class="col" >
     <input id="alt" name="altitude" type="text" class="form-control" placeholder="Высота над уровнем моря, м" aria-label="First name">
   </div>
@@ -69,12 +149,88 @@
 </div>
 </form>
 
-  <form> method=POST
-<div class="input-group" style="width: 600px; margin-left:10px">
+<br>
+
+<form class="row align-items-center block6" >
+  <p class="lead block7">
+  2. Загрузка массива данных для обучения
+</p>
+
+  <figure class="figure">
+  <img src="https://i.ibb.co/PCt3z1w/sample-csv.png"  class="figure-img img-fluid rounded">
+  <figcaption class="figure-caption text-center">Пример содержимого файла с массивом данных</figcaption>
+</figure>
+
+  <label for="geo_coord" class="form-label text-center">Требуемое расширение файла - .csv</label>
+
+  <div class="input-group" style="width: 585px;padding-left: 24px;padding-bottom: 10px;">
   <input type="file" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
   <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon04">Загрузить</button>
-</div>
+  </div>
+
+  <label for="geo_coord" class="form-label text-center">Введите наименования столбцов с предикторами через запятую</label>
+  <input class="form-control" type="text" placeholder="Например, T, U, Cl, aoi" aria-label="default input example">
+
+  <label for="geo_coord" class="form-label text-center">Введите наименования столбца с предиктантом</label>
+  <input class="form-control" type="text" placeholder="Например, I" aria-label="default input example">
+
 </form>
+
+<br>
+<form class="row align-items-center block6" >
+  <p class="lead block7">
+  3. Выбор параметров модели прогнозирования
+</p>
+
+  <label for="geo_coord" class="form-label text-center">Тип модели прогнозирования</label>
+
+  <div class="form-check block33">
+  <input class="form-check-input" type="radio" name="flexRadioDefault1" id="flexRadioDefault1" disabled>
+  <label class="form-check-label" for="flexRadioDefault1">
+    Эндогенная (TS)
+  </label>
+</div>
+  <div class="form-check block33">
+  <input class="form-check-input" type="radio" name="flexRadioDefault2" id="flexRadioDefault2" disabled>
+  <label class="form-check-label" for="flexRadioDefault2">
+    Экзогенная (TS)
+  </label>
+</div>
+
+<div class="form-check block33" >
+  <input class="form-check-input" type="radio" name="flexRadioDefault3" id="flexRadioDefault3" checked>
+  <label class="form-check-label" for="flexRadioDefault3">
+    Экзогенная (NWP)
+  </label>
+</div>
+
+    <label for="geo_coord" class="form-label text-center">Математическая модель обучения</label>
+
+  <div class="form-check block33">
+  <input class="form-check-input" type="radio" name="flexRadioDefault4" id="flexRadioDefault4" disabled>
+  <label class="form-check-label" for="flexRadioDefault4">
+    k-ближ. соседей
+  </label>
+</div>
+  <div class="form-check block33">
+  <input class="form-check-input" type="radio" name="flexRadioDefault5" id="flexRadioDefault5" disabled>
+  <label class="form-check-label" for="flexRadioDefault5">
+    Случайный лес
+  </label>
+</div>
+
+<div class="form-check block33" >
+  <input class="form-check-input" type="radio" name="flexRadioDefault6" id="flexRadioDefault6" checked>
+  <label class="form-check-label" for="flexRadioDefault6">
+    Многослойный перцептрон
+  </label>
+</div>
+
+
+</form>
+
+
+
 
   <div class="col-auto" style="margin-top:10px; margin-bottom:10px; margin-left:22px">
 
@@ -111,7 +267,7 @@
 </script>
 
 
-</head>
+
 
 
 

@@ -113,17 +113,17 @@ def get_geo():
     fig = make_subplots(specs=[[{"secondary_y": True}]])
 
     fig.add_trace(
-        go.Scatter(x=tmy.index.dayofyear, y=tmy['temp_air'], name="Температура воздуха"),
+        go.Scatter(x=(tmy.index.dayofyear - 1) * 24 + tmy.index.hour, y=tmy['temp_air'], name="Температура воздуха"),
         secondary_y=False,
     )
 
     fig.add_trace(
-        go.Scatter(x=tmy.index.dayofyear, y=tmy['ghi'], name="Суммарная солнечная радиация,<br>на горизонтальной поверхности"),
+        go.Scatter(x=(tmy.index.dayofyear - 1) * 24 + tmy.index.hour, y=tmy['ghi'], name="Суммарная солнечная радиация,<br>на горизонтальной поверхности"),
         secondary_y=True,
     )
 
     fig.add_trace(
-        go.Scatter(x=tmy.index.dayofyear, y=tmy['dhi'], name="Рассеянная солнечная радиация<br>на горизонтальной поверхности"),
+        go.Scatter(x=(tmy.index.dayofyear - 1) * 24 + tmy.index.hour, y=tmy['dhi'], name="Рассеянная солнечная радиация<br>на горизонтальной поверхности"),
         secondary_y=True,
     )
 
@@ -132,12 +132,14 @@ def get_geo():
     #    secondary_y=True,
     #)
 
-    fig.update_layout(
-        title_text="Типичный метеорологический год (TMY) по данным PVGIS"
-    )
-    fig.update_xaxes(title_text="Порядковый номер дня в году")
+    fig.update_layout(margin=dict(l=20, r=20),
+        title_text="Типичный метеорологический год (TMY) по данным PVGIS", title_x=0.5,  legend=dict(
+            orientation="h", xanchor="center", x=0.5, y=1.175))
+
+    fig.update_xaxes(title_text="Порядковый номер часа TMY")
     fig.update_yaxes(title_text="<b>Температура воздуха</b>, °С", secondary_y=False)
     fig.update_yaxes(title_text="<b>Солнечная радиация</b> Вт/кв.м", secondary_y=True)
+
 
     #fig = px.line(tmy['temp_air'], x=tmy.index.dayofyear, y='temp_air')
 
