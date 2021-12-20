@@ -49,26 +49,45 @@
     display: table;
     clear: both;
     }
+
+    .block2 {
+  width: 1200px;
+  min-height: 160px;
+  padding-top: 15px;
+  margin:0 auto;
+}
+
+    .block3 {
+  width: 300px;
+  margin:0 auto;
+}
+
+    .block5 {
+  width: 1200px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 25px;
+  font-size: 32px;
+}
+
+.block6 {
+  width: 800px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  font-size: 22px;
+}
+
     </style>
  </head>
 
+<h5 class="display-6 block5">Станция мониторинга в г. Новочебоксарск</h5>
 
-<center><h4><p><a href="http://ntc.nudl.net" target="_blank">Новочебоксарск </a></p></h4></center>
-
-<div class="container">
-  <div class="row">
-    <div class='col-sm-5'>
-      <div class="form-group">
-        <div class='input-group date' id='datetimepicker1'>
-          <input type='text' class="form-control" name="daterange" value="11/22/2021 - 01/15/2021" />
-          <span class="input-group-addon">
-            <span class="glyphicon glyphicon-calendar"></span>
-          </span>
-        </div>
-      </div>
-    </div>
-  </div>
-</div>
+<p class="lead block6">
+    Просмотр <a href="http://ntc.nudl.net/">фактических</a> и прогнозных данных
+</p>
 
 <script>
 $(function() {
@@ -80,30 +99,42 @@ $(function() {
 });
 </script>
 
+<div class="row block2">
+  <div class="col">
+    <div id="chart" class="chart"></div>
+  </div>
+</div>
 
+<script>
+    d = {{ graphJSON | safe }};
+    //d.config={staticPlot: true};
+    Plotly.newPlot('chart', d, {});
+</script>
 
+<p class="lead block6">
+    Просмотр архива
+</p>
 
-<body>
-    <div class="row">
-        <div class="column left">
-            <center><img src="{{ image }}"/></center>
-            <center><img src="{{ image2 }}"/></center>
+<div class="container">
+  <div class="row">
+    <div class='col-sm-5 block3'>
+      <div class="form-group">
+        <div class='input-group date' id='datetimepicker1'>
+          <input type='text' class="form-control text-center" name="daterange" value="11/22/2021 - 01/15/2021" />
+          <span class="input-group-addon">
+            <span class="glyphicon glyphicon-calendar"></span>
+          </span>
         </div>
-        <div class="column right">
-            <center><h5>Прогноз в табличном виде</h5></center>
-            <center>
-                {% for table in tables %}
-                {{titles[loop.index]}}
-                {{ table|safe }}
-                {% endfor %}
-                </center>
-        </div>
+      </div>
     </div>
- </body>
+  </div>
+</div>
 
-
-
-
+<script>
+    d = {{ graphJSON | safe }};
+    //d.config={staticPlot: true};
+    Plotly.newPlot('chart', d, {});
+</script>
 
 {% endblock %}
 

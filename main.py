@@ -346,6 +346,117 @@ def plotView():
 
 
 
+
+
+@app.route("/nvchb2", methods=['POST', 'GET'])
+def plotViewo():
+
+    #print(pd.read_sql_query('SELECT * FROM ' + 'heroku_a8cb90579877805' + '.' + 'yrno_nvchb1' + ';', mydb))
+
+    freshest_from_sql = pd.read_sql_query('SELECT * FROM (SELECT * FROM heroku_a8cb90579877805.yrno_nvchb1 ORDER BY id DESC LIMIT 24) sub ORDER BY id ASC;', mydb)
+    freshest_from_sql = freshest_from_sql.set_index(pd.DatetimeIndex(freshest_from_sql['DateTime']))
+
+
+    from_sql_yrno01utc = pd.read_sql_query('SELECT * FROM (SELECT * FROM heroku_a8cb90579877805.yrno_nvchb1 WHERE HOUR(fcst_dt_utc) = 01 ORDER BY id DESC LIMIT 24) sub ORDER BY id ASC;', mydb)
+    from_sql_yrno01utc = from_sql_yrno01utc.set_index(pd.DatetimeIndex(from_sql_yrno01utc['DateTime']))
+    yrno01utc_fcst_dt = pd.DatetimeIndex(from_sql_yrno01utc['fcst_dt_utc']).strftime("%H:%M UTC %d-%m")[0]
+    yrno01utc_fcst = sun_forecast.get_forecast_from_sql(from_sql_yrno01utc,
+                                       56.11, 47.48, 'Europe/Moscow', 40, 180)
+
+    from_sql_yrno09utc = pd.read_sql_query(
+        'SELECT * FROM (SELECT * FROM heroku_a8cb90579877805.yrno_nvchb1 WHERE HOUR(fcst_dt_utc) = 09 ORDER BY id DESC LIMIT 24) sub ORDER BY id ASC;',
+        mydb)
+    from_sql_yrno09utc = from_sql_yrno09utc.set_index(pd.DatetimeIndex(from_sql_yrno09utc['DateTime']))
+    yrno09utc_fcst_dt = pd.DatetimeIndex(from_sql_yrno09utc['fcst_dt_utc']).strftime("%H:%M UTC %d-%m")[0]
+    yrno09utc_fcst = sun_forecast.get_forecast_from_sql(from_sql_yrno09utc,
+                                                        56.11, 47.48, 'Europe/Moscow', 40, 180)
+    #
+    # #подумай о 48-ми часовом прогнозе (рынок на сутки вперед, заявки подаются в 13:30 на след.день)
+    from_sql_yrno13utc = pd.read_sql_query(
+        'SELECT * FROM (SELECT * FROM heroku_a8cb90579877805.yrno_nvchb1 WHERE HOUR(fcst_dt_utc) = 13 ORDER BY id DESC LIMIT 24) sub ORDER BY id ASC;',
+        mydb)
+    from_sql_yrno13utc = from_sql_yrno13utc.set_index(pd.DatetimeIndex(from_sql_yrno13utc['DateTime']))
+    yrno13utc_fcst_dt = pd.DatetimeIndex(from_sql_yrno13utc['fcst_dt_utc']).strftime("%H:%M UTC %d-%m")[0]
+    yrno13utc_fcst = sun_forecast.get_forecast_from_sql(from_sql_yrno13utc,
+                                                        56.11, 47.48, 'Europe/Moscow', 40, 180)
+
+    # from_sql_yrno20utc = pd.read_sql_query(
+    #     'SELECT * FROM (SELECT * FROM heroku_a8cb90579877805.yrno_nvchb1 WHERE HOUR(fcst_dt_utc) = 20 ORDER BY id DESC LIMIT 24) sub ORDER BY id ASC;',
+    #     mydb)
+    # from_sql_yrno20utc = from_sql_yrno09utc.set_index(pd.DatetimeIndex(from_sql_yrno20utc['DateTime']))
+    # yrno20utc_fcst_dt = pd.DatetimeIndex(from_sql_yrno20utc['fcst_dt_utc']).strftime("%H:%M UTC %d-%m")[0]
+    # yrno20utc_fcst = sun_forecast.get_forecast_from_sql(from_sql_yrno20utc,
+    #                                                     56.11, 47.48, 'Europe/Moscow', 40, 180)
+
+    freshest_fcst = sun_forecast.get_forecast_from_sql(freshest_from_sql,
+                                       56.11, 47.48, 'Europe/Moscow', 40, 180)
+    freshest_fcst_dt = pd.DatetimeIndex(freshest_from_sql['fcst_dt_utc']).strftime("%H:%M UTC %d-%m")[0]
+
+    ntc_data = ntc_data_loader()
+
+    # Generate plot
+    fig = make_subplots(specs=[[{"secondary_y": False}]])
+
+    fig.add_trace(
+       go.Scatter(x=ntc_data[0].index,y=ntc_data[0][1], name="Факт. данные"),
+       secondary_y=False,
+    )
+
+    fig.add_trace(
+       go.Bar(x=ntc_data[1].index,y=ntc_data[1][1], name="Факт. среднечасовые данные"),
+       secondary_y=False,
+    )
+
+
+
+    fig.add_trace(
+        go.Scatter(x=freshest_fcst[0].index, y=freshest_fcst[0], name='Прогноз от ' + freshest_fcst_dt),
+        secondary_y=False,
+    )
+
+    fig.add_trace(
+        go.Scatter(x=yrno01utc_fcst[0].index, y=yrno01utc_fcst[0], name='Прогноз от ' + yrno01utc_fcst_dt),
+        secondary_y=False,
+    )
+
+    fig.add_trace(
+        go.Scatter(x=yrno09utc_fcst[0].index, y=yrno09utc_fcst[0], name='Прогноз от ' + yrno09utc_fcst_dt),
+        secondary_y=False,
+    )
+
+    fig.add_trace(
+        go.Scatter(x=yrno13utc_fcst[0].index, y=yrno13utc_fcst[0], name='Прогноз от ' + yrno13utc_fcst_dt),
+        secondary_y=False,
+    )
+
+    fig.update_xaxes(showgrid=True, gridwidth=1, gridcolor='White')
+    fig.update_yaxes(showgrid=True, gridwidth=1, gridcolor='White')
+
+    fig.update_xaxes(zeroline=True, zerolinewidth=2, zerolinecolor='White')
+    fig.update_yaxes(zeroline=True, zerolinewidth=2, zerolinecolor='White')
+
+    fig.update_layout(margin=dict(l=20, r=20),
+                      title_text="Запрос данных мониторинга сделан в " + datetime.now().strftime("%H:%M %d-%m-%Y"), title_x=0.5, legend=dict(
+            orientation="h", xanchor="center", x=0.5, y=1.175))
+
+    fig.update_xaxes(title_text="Дата и время")
+    fig.update_yaxes(title_text="Среднечасовая интенсивность солнечной<br>радиации, Вт/кв.м", secondary_y=False)
+
+    # fig = px.line(tmy['temp_air'], x=tmy.index.dayofyear, y='temp_air')
+
+    graphJSON = json.dumps(fig, cls=plotly.utils.PlotlyJSONEncoder)
+
+
+    return render_template("nvchb.html", graphJSON=graphJSON)
+
+
+
+
+
+
+
+
+
 def ntc_data_loader(given_date=datetime.now().strftime("%Y-%m-%d")):
     target_date = datetime.strptime(given_date, '%Y-%m-%d').date()
     data = {'language': 'Русский', 'date_sel': target_date, 'ServerId': '100'}
