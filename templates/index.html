@@ -5,7 +5,6 @@
 {% endblock %}
 
 {% block body %}
-<h1>Архив nvchb</h1>
 
 <head>
 
@@ -32,7 +31,7 @@
 <style>
 
 .block {
-  width: 600px;
+  width: 800px;
   padding-bottom: 15px;
   margin:0 auto;
 
@@ -54,6 +53,24 @@
   margin:0 auto;
 }
 
+.block5 {
+  width: 1200px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 25px;
+  font-size: 32px;
+}
+
+.block6 {
+  width: 800px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  font-size: 22px;
+}
+
 .center {
   position: absolute;
 /*  top: 0;
@@ -69,14 +86,20 @@
 
 </head>
 
+<h5 class="display-6 block5">Импорт данных TMY</h5>
+
+<p class="lead block6">
+  На этой странице можно импортировать данные типичного метеорологического года (TMY). Источник - <a href="https://re.jrc.ec.europa.eu/pvg_tools/en/#TMY">PVGIS</a>
+</p>
+
 <form class="row align-items-center">
   <label for="geo_coord" class="form-label text-center">Координаты местности</label>
   <div class="row align-items-center block" id="geo_coord">
   <div class="col">
-    <input id="lat" name="latitude" type="text" class="form-control" placeholder="Широта" aria-label="First name">
+    <input id="lat" name="latitude" type="text" class="form-control" placeholder="Широта. Например, 48.15" aria-label="First name">
   </div>
   <div class="col" >
-    <input id="lon" name="longitude" type="text" class="form-control" placeholder="Долгота" aria-label="Last name">
+    <input id="lon" name="longitude" type="text" class="form-control" placeholder="Долгота. Например, 16.23" aria-label="Last name">
   </div>
 </div>
 
@@ -86,12 +109,12 @@
     <input id="alt" name="altitude" type="text" class="form-control" placeholder="Высота над уровнем моря, м" aria-label="First name">
   </div>
   <div class="col">
-    <input id="tz" name="timezone" type="text" class="form-control" placeholder="Часовой пояс" aria-label="Last name">
+    <input id="tz" name="timezone" type="text" class="form-control" placeholder="Часовой пояс. Например, Europe/Moscow" aria-label="Last name">
   </div>
 </div>
 </form>
 
-<div class="block4" id="map" style="width: 600px; height: 400px; padding-bottom: 15px;"></div>
+<div class="block4" id="map" style="width: 750px; height: 400px; padding-bottom: 15px;"></div>
 
 
   <div class="col-auto block3">
