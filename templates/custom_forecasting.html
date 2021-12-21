@@ -1,0 +1,191 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Прогнозирование СИ
+{% endblock %}
+
+{% block body %}
+
+<head>
+
+  <style>
+
+.block {
+  width: 600px;
+  padding-bottom: 15px;
+  margin:0 auto;
+
+}
+.block2 {
+  width: 1200px;
+  min-height: 160px;
+  padding-top: 15px;
+  margin:0 auto;
+}
+
+.block3 {
+  width: 200px;
+  margin:0 auto;
+}
+
+.block33 {
+  width: 100px;
+  margin:0 auto;
+  padding-bottom: 10px;
+}
+
+.block4 {
+  width: 1200px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 25px;
+  font-size: 32px;
+}
+
+.block5 {
+  width: 800px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 15px;
+  font-size: 22px;
+}
+
+.block6 {
+  width: 600px;
+  margin:0 auto;
+  border:1px solid #cecece;
+}
+
+.block7 {
+  width: 1200px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 18px;
+}
+
+.center {
+  position: absolute;
+/*  top: 0;
+  bottom: 0; */
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+</style>
+
+
+
+<script>
+
+        $(function() {
+    $('#upload-file-btn').click(function() {
+        var form_data = new FormData($('#upload-file')[0]);
+        $.ajax({
+            type: 'POST',
+            url: '/uploadajax',
+            data: form_data,
+            contentType: false,
+            cache: false,
+            processData: false,
+            success: function(data) {
+                console.log('Success!');
+            },
+        });
+    });
+});
+
+
+        function load_inputs() {
+            $.('#upload-file-btn').click(function()({
+                type: "POST",
+                url: "/build_forecasting_models",
+                data: $('form').serialize(),
+                type: 'POST',
+                success: function (data) {
+                    Plotly.newPlot('chart', result, {staticPlot: true});;
+                },
+                error: function(error) {
+                    console.log(error);
+                }
+            });
+        }
+    </script>
+
+</head>
+
+<h5 class="display-6 block4">Прогнозирование СИ</h5>
+
+<p class="lead block5">
+  На этой странице можно инициировать прогнозирование СИ по обученной ранее модели
+</p>
+
+
+<form class="row align-items-center block6" >
+  <p class="lead block7">
+  1. Ввод исходных данных
+</p>
+  <label for="geo_coord" class="form-label text-center">Геоданные</label>
+  <div class="row align-items-center block" id="geo_coord">
+  <div class="col">
+    <input id="lat" name="latitude" type="text" class="form-control" placeholder="Широта" aria-label="First name">
+  </div>
+  <div class="col" >
+    <input id="lon" name="longitude" type="text" class="form-control" placeholder="Долгота" aria-label="Last name">
+  </div>
+</div>
+  <div class="row align-items-center block" id="geo_coord2">
+  <div class="col" >
+    <input id="alt" name="altitude" type="text" class="form-control" placeholder="Высота над уровнем моря, м" aria-label="First name">
+  </div>
+  <div class="col">
+    <input id="tz" name="timezone" type="text" class="form-control" placeholder="Часовой пояс" aria-label="Last name">
+  </div>
+</div>
+</form>
+
+<br>
+
+<form class="row align-items-center block6" >
+  <p class="lead block7">
+  2. Загрузка файлов модели
+</p>
+
+  <label for="geo_coord" class="form-label text-center">Требуемое расширение файла - .zip</label>
+
+  <div class="input-group" style="width: 585px;padding-left: 24px;padding-bottom: 10px;">
+  <input type="file" class="form-control" id="inputGroupFile04" aria-describedby="inputGroupFileAddon04" aria-label="Upload">
+  <button class="btn btn-outline-secondary" type="button" id="inputGroupFileAddon04">Загрузить</button>
+  </div>
+
+</form>
+
+<div class="col-auto" style="width: 150px; margin:0 auto; padding-top: 15px; padding-bottom: 15px">
+
+    <button type="submit" class="btn btn-primary" onclick="get_geo();">Сделать прогноз</button>
+  </div>
+
+<form class="row align-items-center block6" >
+  <p class="lead block7">
+  3. Результаты прогнозирвоания
+</p>
+
+  <label for="geo_coord" class="form-label text-center">Тип модели прогнозирования</label>
+
+  <label for="geo_coord" class="form-label text-center">Метрики ошибок</label>
+
+
+</form>
+
+
+
+  <div class="col-auto text-center" style="width: 200px; margin:0 auto; padding-top: 15px; padding-bottom: 15px">
+
+    <button type="submit" class="btn btn-success" onclick="get_geo();">Экспорт прогноза </button>
+  </div>
+
+
+{% endblock %}

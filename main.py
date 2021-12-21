@@ -80,6 +80,11 @@ def bld_fcst_mdl():
 
     return render_template('build_forecasting_models.html', graphJSON=gm())
 
+@app.route('/custom_forecasting')
+def custom_fcst():
+
+    return render_template('custom_forecasting.html', graphJSON=gm())
+
 def gm(country='United Kingdom'):
     df = pd.DataFrame(px.data.gapminder())
 

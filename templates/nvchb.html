@@ -12,8 +12,6 @@
     <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
     <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
 
-
-
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css">
     <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
     <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
@@ -75,9 +73,26 @@
   width: 800px;
   margin:0 auto;
   text-align: center;
-  padding-top: 15px;
-  padding-bottom: 15px;
+  padding-top: 10px;
+  padding-bottom: 10px;
   font-size: 22px;
+}
+
+.block7 {
+  width: 800px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 10px;
+  font-size: 20px;
+}
+
+.center {
+  position: absolute;
+/*  top: 0;
+  bottom: 0; */
+  left: 0;
+  right: 0;
+  margin: auto;
 }
 
     </style>
@@ -111,6 +126,12 @@ $(function() {
     Plotly.newPlot('chart', d, {});
 </script>
 
+<div class="col-auto text-center" style="width: 400px; margin:0 auto; padding-top: 15px; padding-bottom: 15px">
+
+<button type="submit" class="btn btn-success" >Обновить запрос данных</button>
+</div>
+
+
 <p class="lead block6">
     Просмотр архива
 </p>
@@ -129,6 +150,53 @@ $(function() {
     </div>
   </div>
 </div>
+
+
+<!-- Display the countdown timer in an element -->
+
+<p class="lead block7" style="fontsize: 14px">
+    В разработке...
+</p>
+
+<p id="countdown" class="lead block6">
+</p>
+
+
+
+<script>
+// Set the date we're counting down to
+var countDownDate = new Date("Jan 15, 2022 23:59:59").getTime();
+
+// Update the count down every 1 second
+var x = setInterval(function() {
+
+  // Get today's date and time
+  var now = new Date().getTime();
+
+  // Find the distance between now and the count down date
+  var distance = countDownDate - now;
+
+  // Time calculations for days, hours, minutes and seconds
+  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
+  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
+  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
+  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
+
+  // Display the result in the element with id="demo"
+  document.getElementById("countdown").innerHTML = days + "d " + hours + "h "
+  + minutes + "m " + seconds + "s ";
+
+  // If the count down is finished, write some text
+  if (distance < 0) {
+    clearInterval(x);
+    document.getElementById("countdown").innerHTML = "EXPIRED";
+  }
+}, 1000);
+</script>
+
+
+
+
 
 <script>
     d = {{ graphJSON | safe }};
