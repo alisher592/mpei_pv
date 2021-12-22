@@ -37,14 +37,14 @@ app = Flask(__name__)
 
 Bootstrap(app)
 
-app.config['MYSQL_HOST'] = s3.DB_HOST
-app.config['MYSQL_USER'] = s3.DB_USER
-app.config['MYSQL_PASSWORD'] = s3.DB_PASSWORD
-app.config['MYSQL_DB'] = s3.DB_SCHEMA
+app.config['MYSQL_HOST'] = os.environ.get('DB_HOST')
+app.config['MYSQL_USER'] = os.environ.get('DB_USER')
+app.config['MYSQL_PASSWORD'] = os.environ.get('DB_PASSWORD')
+app.config['MYSQL_DB'] = os.environ.get('DB_SCHEMA')
 
 mysql = MySQL(app)
 
-mydb = create_engine('mysql+pymysql://' + s3.DB_USER + ':' + s3.DB_PASSWORD + '@' + s3.DB_HOST + ':' + str(3306) + '/' + s3.DB_SCHEMA, echo=False)
+mydb = create_engine('mysql+pymysql://' + os.environ.get('DB_USER') + ':' + os.environ.get('DB_PASSWORD') + '@' + os.environ.get('DB_HOST') + ':' + str(3306) + '/' + os.environ.get('DB_SCHEMA'), echo=False)
 
 
 app.debug = False
