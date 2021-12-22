@@ -31,7 +31,7 @@ import pvlib
 from boto.s3.connection import S3Connection
 import os
 
-s3 = S3Connection(os.environ['DB_HOST'], os.environ['DB_USER'], os.environ['DB_PASSWORD'], os.environ['DB_SCHEMA'])
+#s3 = S3Connection(os.environ['DB_HOST'], os.environ['DB_USER'], os.environ['DB_PASSWORD'], os.environ['DB_SCHEMA'])
 
 app = Flask(__name__)
 
@@ -45,7 +45,6 @@ app.config['MYSQL_DB'] = os.environ.get('DB_SCHEMA')
 mysql = MySQL(app)
 
 mydb = create_engine('mysql+pymysql://' + os.environ.get('DB_USER') + ':' + os.environ.get('DB_PASSWORD') + '@' + os.environ.get('DB_HOST') + ':' + str(3306) + '/' + os.environ.get('DB_SCHEMA'), echo=False)
-
 
 app.debug = False
 
@@ -210,6 +209,7 @@ def mpei():
     #ax.set_aspect('auto')
     # Convert plot to PNG image
     pngImage = io.BytesIO()
+    plt.savefig('mpei_pan.png')
     FigureCanvas(fig).print_png(pngImage)
 
     # Encode PNG image to base64 string
