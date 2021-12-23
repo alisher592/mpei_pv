@@ -74,6 +74,10 @@ sun_forecast = SunForecast()
 def index():
     return render_template('index.html', graphJSON=gm())
 
+@app.route('/mg_modelling')
+def mg_mdl():
+    return render_template('mg_modelling.html')
+
 @app.route('/build_forecasting_models')
 def bld_fcst_mdl():
 
