@@ -1,0 +1,126 @@
+{% extends 'base.html' %}
+
+{% block title %}
+МЭИ
+{% endblock %}
+
+{% block body %}
+
+<head>
+
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+    <script>
+        $('input[name="dates"]').daterangepicker({startDate: '11/30/2021'});
+    </script>
+
+
+
+
+    <style>
+    {
+        box-sizing: border-box;
+    }
+    /* Set additional styling options for the columns*/
+    .column {
+    float: left;
+    width: 50%;
+    white-space: nowrap;
+    }
+
+    .right1 {
+    width: 25%;
+    }
+
+    .right2 {
+    width: 25%;
+    }
+
+    .row:after {
+    content: "";
+    display: table;
+    clear: both;
+    }
+
+    .block2 {
+  width: 1200px;
+  min-height: 160px;
+  padding-top: 15px;
+  margin:0 auto;
+}
+
+    .block3 {
+  width: 300px;
+  margin:0 auto;
+}
+
+    .block5 {
+  width: 1200px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 25px;
+  font-size: 32px;
+}
+
+.block6 {
+  width: 800px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 22px;
+}
+
+.block7 {
+  width: 800px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 10px;
+  font-size: 20px;
+}
+
+.center {
+  position: absolute;
+/*  top: 0;
+  bottom: 0; */
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+    </style>
+ </head>
+
+<p class="lead block6">
+    Данные мониторинга недоступны на данную секунду. Повторите попытку позднее
+</p>
+
+
+<div class="row block2">
+  <div class="col">
+    <div id="chart" class="chart"></div>
+  </div>
+</div>
+
+<script>
+    d = {{ graphJSON | safe }};
+    //d.config={staticPlot: true};
+    Plotly.newPlot('chart', d, {});
+</script>
+
+<div class="col-auto text-center" style="width: 400px; margin:0 auto; padding-top: 15px; padding-bottom: 15px">
+
+<a href="." type="submit" class="btn btn-success" role="button">Перезагрузить страницу</a>
+</div>
+
+
+
+{% endblock %}
+

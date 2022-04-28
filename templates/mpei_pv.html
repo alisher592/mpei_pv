@@ -1,0 +1,278 @@
+{% extends 'base.html' %}
+
+{% block title %}
+Метеостанция МЭИ
+{% endblock %}
+
+
+{% block body %}
+
+
+
+<head>
+
+    <script src="{{ url_for('static', filename='js/three.min.js') }}"></script>
+    <script src="{{ url_for('static', filename='js/photo-sphere-viewer.js') }}"></script>
+
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/jquery/latest/jquery.min.js"></script>
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/momentjs/latest/moment.min.js"></script>
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/bootstrap-datetimepicker/4.7.14/css/bootstrap-datetimepicker.min.css">
+    <script type="text/javascript" src="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.min.js"></script>
+    <link rel="stylesheet" type="text/css" href="https://cdn.jsdelivr.net/npm/daterangepicker/daterangepicker.css" />
+
+
+    <script src="http://cdnjs.cloudflare.com/ajax/libs/moment.js/2.13.0/moment.min.js"></script>
+
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/2.8.0/Chart.bundle.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chart.js@2.8.0"></script>
+    <script src="https://cdn.jsdelivr.net/npm/hammerjs@2.0.8"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-zoom@0.7.3"></script>
+
+
+
+
+        <style>
+    {
+        box-sizing: border-box;
+    }
+    /* Set additional styling options for the columns*/
+    .column {
+    float: left;
+    width: 50%;
+    white-space: nowrap;
+    }
+
+    .right1 {
+    width: 25%;
+    }
+
+    .right2 {
+    width: 25%;
+    }
+
+    .row:after {
+    content: "";
+    display: table;
+    clear: both;
+    }
+
+    .block2 {
+  width: 1200px;
+  min-height: 160px;
+  padding-top: 15px;
+  margin:0 auto;
+}
+
+    .block3 {
+  width: 300px;
+  margin:0 auto;
+}
+
+    .block5 {
+  width: 1200px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 15px;
+  padding-bottom: 25px;
+  font-size: 32px;
+}
+
+.block6 {
+  width: 800px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  font-size: 22px;
+}
+
+.block7 {
+  width: 800px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 10px;
+  font-size: 20px;
+}
+
+.block8 {
+  width: 800px;
+  margin:0 auto;
+  text-align: center;
+  padding-top: 10px;
+  font-size: 20px;
+}
+
+.center {
+  position: absolute;
+/*  top: 0;
+  bottom: 0; */
+  left: 0;
+  right: 0;
+  margin: auto;
+}
+
+    </style>
+
+
+</head>
+
+
+<body style="background-color:#18191a;">
+
+</body>
+
+
+
+<div class="row block2">
+  <div class="col">
+    <div id="chart" class="chart"></div>
+  </div>
+</div>
+
+<script>
+    //d = {{ graphJSON | safe }};
+    //d.config={staticPlot: true};
+    //Plotly.newPlot('chart', d, {});
+</script>
+
+
+<canvas id="myChart" width="800" height="400" style="margin:0 auto"></canvas>
+
+
+
+ <div class="btn-toolbar" style="width: 400px; margin:0 auto;">
+        <button class="btn btn-primary" style="margin:0 auto" type="submit" class="btn btn-success" role="button" onclick="resetZoom3();">Сбросить вид</button>
+        <button class="btn btn-primary" style="margin:0 auto" type="submit" class="btn btn-success" role="button" onclick="update();">Обновить запрос</button>
+        </button>
+      </div>
+
+
+
+
+
+<p id="caption">The chart is displaying a simple line chart.</p>
+
+<script>
+    // Global parameters:
+// do not resize the chart canvas when its container does (keep at 600x400px)
+Chart.defaults.global.responsive = false;
+
+var timeFormat = 'hh:mm:ss';
+
+function newDateString(hours, minutes, seconds) {
+return moment().hour(hours).minute(minutes).second(seconds).format(timeFormat);
+}
+
+
+// define the chart data
+var chartData = {
+labels : [{% for item in labels %}
+newDateString( {{item.hour}}, {{item.minute}}, {{item.second}} ),
+{% endfor %}],
+datasets : [{
+label: '{{ legend }}',
+fill: true,
+
+lineTension: 0.1,
+backgroundColor: "rgba(75,192,192,0.4)",
+borderColor: "rgba(75,192,192,1)",
+borderCapStyle: 'butt',
+borderDash: [],
+borderDashOffset: 0.0,
+borderJoinStyle: 'miter',
+pointBorderColor: "rgba(75,192,192,1)",
+pointBackgroundColor: "#fff",
+pointBorderWidth: 1,
+pointHoverRadius: 5,
+pointHoverBackgroundColor: "rgba(75,192,192,1)",
+pointHoverBorderColor: "rgba(220,220,220,1)",
+pointHoverBorderWidth: 2,
+pointRadius: 1,
+pointHitRadius: 10,
+data : [{% for item in gti %}
+{{item}},
+{% endfor %}],
+spanGaps: false
+}]
+}
+
+// get chart canvas
+var ctx = document.getElementById("myChart").getContext("2d");
+
+
+    // create the chart using the chart canvas
+    var myChart = new Chart(ctx, {
+    type: 'line',
+    data: chartData,
+
+
+    options: {
+
+     plugins: {
+                zoom: {
+                    pan: {
+                        enabled: true,
+                        mode: 'xy'
+                    },
+                    zoom: {
+                        enabled: true,
+                        mode: 'xy'
+                    },
+                    pinch: {
+                        enabled: true
+                    },
+                }
+            },
+
+    scales: {
+      xAxes: [{
+        position: 'bottom',
+        gridLines: {
+          color: 'rgba(171,171,171,1)',
+          lineWidth: 0.125
+        }
+      }],
+      yAxes: [{
+        afterUpdate: function(scaleInstance) {
+          console.dir(scaleInstance);
+        },
+        gridLines: {
+          color: 'rgba(171,171,171,1)',
+          lineWidth: 0.125
+        }
+      }]
+    },
+
+
+    tooltips: {
+    enabled: true,
+    mode: 'single',
+    callbacks: {
+    label: function(tooltipItems, data) {
+    return tooltipItems.yLabel + ' \u00B0C'; //добавляем приписку с единицами измерения
+    }
+    }
+    },
+    }
+    });
+
+
+
+
+function resetZoom3() {
+    myChart.resetZoom();
+}
+
+function update() {
+    myChart.update();
+}
+
+</script>
+
+
+
+{% endblock %}
