@@ -16,11 +16,20 @@ from sklearn.metrics import mean_absolute_error
 from sklearn.metrics import mean_squared_error
 from sklearn.metrics import r2_score
 
+from bs4 import BeautifulSoup
+import numpy as np
+from time import localtime, strftime
+from datetime import datetime, timedelta, timezone
+import re
+import requests
+
+import sun_geo
+sun=sun_geo.sunny()
 
 class Forecaster():
 
 
-    def yrnoparser(latitude, longitude, set_timezone, horizon=24, 
+    def yrnoparser(latitude, longitude, set_timezone, horizon=48, 
                 useragent='mpei.ru, NarynbayevA@mpei.ru, student project'):
         
         """
@@ -69,6 +78,154 @@ class Forecaster():
             return ('Неизвестная ошибка', e)
         return forecast.iloc[1:horizon+1] #возвращает датайфрейм с прогнозом
 
+
+    def rp5_parser(self, url, lat, lon):
+
+        headers = {
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,image/webp,image/apng,*/*;q=0.8,application/signed-exchange;v=b3;q=0.9',
+            'Accept-Encoding': 'gzip, deflate, br', 'Accept-Language': 'ru-RU,ru;q=0.9,en-US;q=0.8,en;q=0.7',
+            'Cache-Control': 'max-age=0',
+            'Connection': 'keep-alive', 'Host': 'rp5.ru', 'Sec-Fetch-Dest': 'document', 'Sec-Fetch-Mode': 'navigate',
+            'Sec-Fetch-Site': 'none',
+            'Sec-Fetch-User': '?1', 'Upgrade-Insecure-Requests': '1',
+            'User-Agent': 'Mozilla/5.0 (Windows NT 6.1; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/80.0.3987.163 Safari/537.36',
+            'cookie': 'PHPSESSID=b52677c7a0c53e6bcac0cbccda01a6f2; __utmc=66441069; __utmz=66441069.1586692831.1.1.utmcsr=google|utmccn=(organic)|utmcmd=organic|utmctr=(not%20provided); located=1; extreme_open=false; __gads=ID=875638f002ac7f69:T=1586693599:S=ALNI_MbIIJzruHefdR7SWM-U-iaFDg6hfw; ftab=3; full_table=1; __utma=66441069.536792610.1586692831.1586792796.1586981798.6; i=6058%7C6058%7C6058%7C6058%7C6058; iru=6058%7C6058%7C6058%7C6058%7C6058; ru=%D0%9D%D0%BE%D0%B2%D0%BE%D1%87%D0%B5%D0%B1%D0%BE%D0%BA%D1%81%D0%B0%D1%80%D1%81%D0%BA%7C%D0%9D%D0%BE%D0%B2%D0%BE%D1%87%D0%B5%D0%B1%D0%BE%D0%BA%D1%81%D0%B0%D1%80%D1%81%D0%BA%7C%D0%9D%D0%BE%D0%B2%D0%BE%D1%87%D0%B5%D0%B1%D0%BE%D0%BA%D1%81%D0%B0%D1%80%D1%81%D0%BA%7C%D0%9D%D0%BE%D0%B2%D0%BE%D1%87%D0%B5%D0%B1%D0%BE%D0%BA%D1%81%D0%B0%D1%80%D1%81%D0%BA%7C%D0%9D%D0%BE%D0%B2%D0%BE%D1%87%D0%B5%D0%B1%D0%BE%D0%BA%D1%81%D0%B0%D1%80%D1%81%D0%BA; last_visited_page=http%3A%2F%2Frp5.ru%2F%D0%9F%D0%BE%D0%B3%D0%BE%D0%B4%D0%B0_%D0%B2_%D0%9D%D0%BE%D0%B2%D0%BE%D1%87%D0%B5%D0%B1%D0%BE%D0%BA%D1%81%D0%B0%D1%80%D1%81%D0%BA%D0%B5; lang=ru; __utmb=66441069.2.10.1586981798; is_adblock=0'
+        }
+
+        try:
+            r = requests.get(url, headers=headers)
+            soup = BeautifulSoup(r.text, 'lxml')
+            table = soup.find_all('table')[10]  # таблица с прогнозом на сутки с rp5
+            table1 = soup.find('table', id='forecastTable_1_3')
+            # парсинг HTML таблицы с rp5
+            lst = np.zeros((14, 25)).tolist()
+            listo = []
+            for i in range(0, 40):  # 26
+                listo.append([])
+            lst_counter = 0
+            for row in table1.find_all('tr'):
+
+                for cell in row.find_all('td'):
+                    listo[lst_counter].append(cell.text)
+                lst_counter += 1
+            day = []
+            date = []
+            timeh = pd.Series(listo[1][1:40]).astype(int)  # 25
+            today = datetime.now().strftime('%Y-%m-%d')
+            tomorrow = (datetime.now() + timedelta(days=1)).strftime('%Y-%m-%d')
+            for hour in timeh:
+                if hour > localtime().tm_hour and hour > 0:
+                    date.append(
+                        today + ' ' + str(hour) + ':00')  # собираем человеческий формат даты вместо того, что на RP5
+                    day.append(localtime().tm_yday)
+                elif hour <= localtime().tm_hour and hour >= 0:
+                    date.append(tomorrow + ' ' + str(hour) + ':00')
+                    day.append(localtime().tm_yday + 1)
+
+            cld = []
+            cld_raw = []
+
+            for elem in table1.findAll("div", {"class": "cc_0"}):
+                for tag in elem.find_all(onmouseover=True):
+                    #print(tag)
+                    jasno = re.findall(r'\b[Я]\w+', tag['onmouseover'])
+                    clouds_info_raw_text = re.findall(r'\b\w+',
+                                                      tag[
+                                                          'onmouseover'])  # сырая информация с детализацией по облачности
+                    cld_raw.append(clouds_info_raw_text)
+                    if jasno == ['Ясно'] and re.findall(r'\d{1,4}', tag['onmouseover']) == []:
+                        cld.append([0])
+                        # print(re.findall(r'\b[Я]\w\w\w',tag['onmouseover']))
+                    #         print(i)
+                    if re.findall(r'\d{1,4}%', tag['onmouseover']) != []:
+                        cld.append([int(s) for s in (
+                            re.findall(r'\d{1,4}',
+                                       tag['onmouseover']))])  # добавление значений облачности в процентах в список
+                        # print([int(s) for s in (re.findall(r'\d{1,4}',tag['onmouseover']))])
+
+            clouds = []
+
+            for el in cld:
+                # clouds.append(max(el))  # выбор максимального значения процента облачности
+                if sum(el) >= 100:
+                    clouds.append(100)
+                else:
+                    clouds.append(sum(el))
+
+            # print(listo)
+
+            for i in range(0, len(listo)):
+                if 'Температура' in str(listo[i]):
+                    temp_idx = i
+                if 'Давление' in str(listo[i]):
+                    pressure_idx = i
+                if 'Ветер' in str(listo[i]):
+                    wind_idx = i
+                if 'Влажность' in str(listo[i]):
+                    hum_idx = i
+
+            temp = []
+            for i in listo[
+                temp_idx]:  # индекс listo - номер строки из таблицы прогноза с rp5 с соответвующим ему параметром
+                temp.append(re.split(r'\s', i)[1])
+            pressure = []
+            # print(listo[pressure_idx])
+            for i in listo[pressure_idx]:
+                pressure.append(re.split(r'\s', i)[1])
+            wind = []
+            for i in listo[wind_idx]:
+                if len(re.split(r'\s', i)) == 1:
+                    j = 0
+                else:
+                    j = 1
+                wind.append(re.split(r'\s', i)[j])
+
+            temperature = pd.Series(temp[1:37])  # 25
+            pressureHPA = pd.Series(pressure[1:37]).astype(float) * 1.33322  # 25
+            pressure = pd.Series(pressure[1:37])  # 25
+            wind = pd.Series(wind[1:37])  # 25
+            clouds = pd.Series(clouds)
+            humidity = pd.Series(listo[hum_idx][1:37])  # 25
+            date = pd.Series(date)
+            day = pd.Series(day)
+            #lat = 56.0827338
+            inc = sun.inc_a(lat, day, timeh, 40, 1)[1]
+            zen = sun.zen(lat, day, timeh)[0]
+            forecastRP5 = pd.concat([date, inc, temperature, clouds, pressureHPA, humidity, wind, zen, pressure],
+                                    axis=1).dropna()
+            forecastRP5.rename(
+                columns={forecastRP5.columns[0]: 'Date', forecastRP5.columns[1]: 'inc', forecastRP5.columns[2]: 'T',
+                         forecastRP5.columns[3]: 'Cl', forecastRP5.columns[4]: 'P0', forecastRP5.columns[5]: 'U',
+                         forecastRP5.columns[6]: 'Ff', forecastRP5.columns[7]: 'zen',
+                         forecastRP5.columns[8]: 'P0mm'}, inplace=True)
+            # forecastRP5['Date'] = pd.to_datetime(forecastRP5['Date'])
+
+            artificial_datetime = pd.date_range(datetime.now() + timedelta(hours=1),
+                                                datetime.now() + timedelta(hours=36),
+                                                freq='h').strftime("%y-%m-%d %H")
+            artificial_datetime1 = pd.to_datetime(artificial_datetime).strftime("%y-%m-%d %H:%M:%S")
+
+            forecastRP5['Date'] = artificial_datetime1
+
+            forecastRP5['Clouds_raw_info'] = cld_raw[0:36]
+
+            forecastRP5['Clouds_raw_info'] = forecastRP5['Clouds_raw_info'].apply(', '.join)
+
+            forecastRP5 = forecastRP5.set_index('Date')
+
+            forecastRP5[['zenith', 'solar_azimuth']] = spa_python(forecastRP5.index,
+                                                               lat,
+                                                               lon)[['apparent_zenith',
+                                                                           'azimuth']]
+
+            return forecastRP5
+        except Exception as e:
+            return ('Ошибка парсинга rp5', e)
+
+
+
+
+
     def mkforecast(filename, weather_fcst, columns, X_scaler_param_file,
                 Y_scaler_param_file, pv_tilt, pv_azimuth, test_mode, savefile = False):
         """
@@ -106,7 +263,7 @@ class Forecaster():
             if savefile==True:
                 weather_fcst['irradiance'].to_csv('Прогноз, сделанный в '+
                     strftime("%H-%M %d-%m-%Y", localtime())+'.csv')
-            return weather_fcst[['air_temperature', 'irradiance']]
+            return weather_fcst[['irradiance']] #'air_temperature',
         else:
             X = X_scaler.transform(weather_fcst[columns])
             raw_I_fcst=model.predict(X).reshape(len(model.predict(X)), -1)  

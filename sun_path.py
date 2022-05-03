@@ -36,13 +36,11 @@ for date in pd.to_datetime(['2019-03-21', '2019-06-21', '2019-12-21', datetime.n
     ax.plot(solpos.azimuth, solpos.apparent_elevation, label=label)
 
 ax.scatter(solarposition.get_solarposition(datetime.utcnow(), lat, lon).azimuth, solarposition.get_solarposition(datetime.utcnow(), lat, lon).apparent_elevation, s=1200, label = 'now')
-
-t=0
-
+t==0
 if t==0:
-    im = plt.imread("mpei_pn4.jpg")
+    im = plt.imread("mpei_pano2_cmpr.jpg")
 
-implot = plt.imshow(im, origin='upper', extent=[0, 360, 0, 180])
+implot = plt.imshow(im, origin='upper', extent=[0, 360, 0, 25])
 
 
 
@@ -52,5 +50,3 @@ implot = plt.imshow(im, origin='upper', extent=[0, 360, 0, 180])
 #ax.figure.legend(loc='upper left')
 ax.set_xlabel('Solar Azimuth (degrees)')
 ax.set_ylabel('Solar Elevation (degrees)')
-plt.savefig('test.png')
-#plt.show()

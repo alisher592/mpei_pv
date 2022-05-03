@@ -1,7 +1,7 @@
 {% extends 'base.html' %}
 
 {% block title %}
-СЭС МЭИ
+Метеостанция МЭИ
 {% endblock %}
 
 
@@ -125,13 +125,13 @@
 
 </body>
 
-<form action="{{ url_for('get_csv_mpei_pv') }}" method="post">
+<form action="{{ url_for('get_csv') }}" method="post">
 <div class="input-group block3">
   <input type="text" name="From" id="From" class="form-control" placeholder="Стартовая дата">
   <input type="text" name="to" id="to" class="form-control" placeholder="Конечная дата">
   <div class="input-group-prepend">
     <input type="button" name="range" id="range" value="Отобразить" class="btn btn-success"/>
-      <a href="/get_csv_mpei_pv" id=test><button target="_blank" class="btn btn-success">Скачать данные</button></a>
+      <a href="/get_csv" id=test><button target="_blank" class="btn btn-success">Скачать данные</button></a>
   </div>
 </div>
 </form>
@@ -142,7 +142,7 @@
             e.preventDefault()
             $.getJSON(
                 type: "POST",
-                url: "/get_csv_mpei_pv",
+                url: "/get_csv",
                 data:{From:From, to:to},
                 function(data) {
               //do nothing
@@ -175,7 +175,7 @@ $(document).ready(function(){
         {
             $.getJSON({
                 type: "POST",
-                url: "/process_dateh_mpei_pv",
+                url: "/process_dateh",
                 data:{From:From, to:to},
                 type: 'POST',
                 beforeSend: function () {
@@ -218,6 +218,8 @@ $(document).ready(function(){
     Plotly.newPlot('chart', d, {});
 </script>
 
+
+<div class="modal"><!-- Place at bottom of page --></div>
 
 
 {% endblock %}

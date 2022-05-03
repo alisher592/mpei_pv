@@ -27,6 +27,7 @@ class SunForecast():
         self.pv_tilt_angle = 40
         self.pv_azimuth_angle = 180
         self.trained_model_filename = 'files/trained_model.mdl'
+        self.url = ''
 
     def init(self, parameters):
         # Загрузка данных модели исходя из настроек в объекте parameters
@@ -108,7 +109,7 @@ class SunForecast():
     def get_forecast(self):
         # метод должен возвращать прогноз на сутки вперед
         # загрузка метеопрогноза с ресурса yr.no по академическому useragent
-        weather_forecast = Forecaster.weather_fcst = Forecaster.yrnoparser(self.location_lat, self.location_lon, self.location_tz,  horizon=24)
+        weather_forecast = Forecaster.weather_fcst = Forecaster.yrnoparser(self.location_lat, self.location_lon, self.location_tz,  horizon=48)
         # прогнозирование интенсивности солнечной радиации
         I = Forecaster.mkforecast(self.trained_model_filename, weather_forecast,
                                        ['aoi', 'air_temperature', 'relative_humidity', 'cloud_area_fraction'],
@@ -119,6 +120,24 @@ class SunForecast():
 
         return I['irradiance'], weather_forecast # .to_json(date_format='iso', date_unit='s') #PV_output.to_json(date_format='iso', date_unit='s')
 
+
+    def get_forecast_from_rp5(self):
+        # метод должен возвращать прогноз на сутки вперед
+        # загрузка метеопрогноза с ресурса yr.no по академическому useragent
+        weather_forecast = Forecaster.weather_fcst = Forecaster.rp5_parser(Forecaster(), self.url, self.location_lat, self.location_lon)
+        #print(weather_forecast)
+        # прогнозирование интенсивности солнечной радиации
+        #I = Forecaster.mkforecast(self.trained_model_filename, weather_forecast,
+                                       #['inc', 'T', 'U', 'Cl'],
+                                       #self.X_scaler_filename, self.y_scaler_filename,
+                                       #self.pv_tilt_angle, self.pv_azimuth_angle, test_mode=False) #.tz_localize(None)
+        # вычисление выработки массива ФЭМ по спрогнозированной интенсивности солнечной радиации
+        #PV_output = Forecaster.PV_array_yield(self.pv_model['stc_power'], self.pv_model['area'], self.pv_model['kt'], I['irradiance'], I['air_temperature'], self.pv_modules_number)
+
+        return weather_forecast
+
+
+
     def get_forecast_from_sql(self, sql_df, lat, lon, tz, pv_tilt, pv_azimuth):
         # метод должен возвращать прогноз на сутки вперед
         # загрузка метеопрогноза с ресурса yr.no по академическому useragent из БД
@@ -128,7 +147,7 @@ class SunForecast():
         sql_df = sql_df.tz_localize('UTC').tz_convert(str(tz))
         sql_df[['zenith', 'solar_azimuth']] = spa_python(sql_df.index,
                                                            lat,
-                                                           lon)[['apparent_zenith',
+                                                           lon,delta_t=None)[['zenith',
                                                                        'azimuth']]
         sql_df['aoi'] = aoi(pv_tilt, pv_azimuth,
                                   sql_df['zenith'], sql_df['solar_azimuth'])

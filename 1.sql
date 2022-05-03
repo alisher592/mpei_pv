@@ -1,4 +1,5 @@
-CREATE TABLE yrno_nvchb2(id INT AUTO_INCREMENT UNIQUE,
+USE weather;
+CREATE TABLE yrno_nvchb(id INT AUTO_INCREMENT UNIQUE,
 					fcst_id VARCHAR(20),
 					DateTime VARCHAR(20),
                     air_pressure double,

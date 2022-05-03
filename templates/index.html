@@ -51,7 +51,6 @@
 .block4 {
   width: 600px;
   margin:0 auto;
-  padding-bottom: 15px;
 }
 
 .block5 {
@@ -71,24 +70,6 @@
   padding-bottom: 15px;
   font-size: 22px;
 }
-
-.block8 {
-  width: 800px;
-  margin:0 auto;
-  text-align: center;
-  padding-top: 10px;
-  padding-bottom: 10px;
-  font-size: 22px;
-}
-
-.block9 {
-  width: 800px;
-  margin:0 auto;
-  text-align: center;
-  padding-top: 10px;
-  font-size: 20px;
-}
-
 
 .center {
   position: absolute;
@@ -133,7 +114,7 @@
 </div>
 </form>
 
-<div class="block4" id="map" style="width: 750px; height: 400px;"></div>
+<div class="block4" id="map" style="width: 750px; height: 400px; padding-bottom: 15px;"></div>
 
 
   <div class="col-auto block3">
@@ -147,59 +128,13 @@
   </div>
 </div>
 
-<div class="col-auto text-center" style="width: 400px; margin:0 auto; padding-top: 15px; padding-bottom: 15px">
-
-<button type="submit" class="btn btn-success" >Скачать файл TMY</button>
-</div>
-
-<p class="lead block9" style="fontsize: 14px">
-    В разработке...
-</p>
-
-<p id="countdown" class="lead block8">
-</p>
-
-
-
-<script>
-// Set the date we're counting down to
-var countDownDate = new Date("Jan 15, 2022 23:59:59").getTime();
-
-// Update the count down every 1 second
-var x = setInterval(function() {
-
-  // Get today's date and time
-  var now = new Date().getTime();
-
-  // Find the distance between now and the count down date
-  var distance = countDownDate - now;
-
-  // Time calculations for days, hours, minutes and seconds
-  var days = Math.floor(distance / (1000 * 60 * 60 * 24));
-  var hours = Math.floor((distance % (1000 * 60 * 60 * 24)) / (1000 * 60 * 60));
-  var minutes = Math.floor((distance % (1000 * 60 * 60)) / (1000 * 60));
-  var seconds = Math.floor((distance % (1000 * 60)) / 1000);
-
-  // Display the result in the element with id="demo"
-  document.getElementById("countdown").innerHTML = days + "d " + hours + "h "
-  + minutes + "m " + seconds + "s ";
-
-  // If the count down is finished, write some text
-  if (distance < 0) {
-    clearInterval(x);
-    document.getElementById("countdown").innerHTML = "EXPIRED";
-  }
-}, 1000);
-</script>
-
-
 
 <script src="https://cdn.plot.ly/plotly-latest.min.js"></script>
     <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.5.1/jquery.min.js"></script>
     <script>
-        function cb(selection) {
+        function cb2(selection) {
             $.getJSON({
-                url: "/callback", data: { 'data': selection }, success: function (result) {
+                url: "/callback2", data: { 'data': selection }, success: function (result) {
                     Plotly.newPlot('chart', result, {staticPlot: true});;
                 }
             });
@@ -235,6 +170,11 @@ var x = setInterval(function() {
         });
     }
 </script>
+
+
+
+
+
 
 
 
